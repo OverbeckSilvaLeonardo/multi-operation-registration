@@ -3,8 +3,9 @@
     <v-responsive class="fill-height">
       <v-card>
         <v-tabs v-model="tab" bg-color="primary">
-          <v-tab value="one">Geral</v-tab>
-          <v-tab value="two">Detalhamento</v-tab>
+          <v-tab value="one">Criar Operações</v-tab>
+          <v-tab value="two">Configurar Operações</v-tab>
+          <v-tab value="three">Resumo da Configuração</v-tab>
         </v-tabs>
 
         <v-card-text>
@@ -20,6 +21,7 @@
               >
                 Adicionar Operações
               </v-btn>
+
               <v-table>
                 <thead>
                   <tr>
@@ -40,120 +42,165 @@
 
             <v-window-item value="two">
               <v-expansion-panels>
-                <v-expansion-panel v-for="(operacao, index) in dados" :key="operacao.name" :title="operacao.name">
-                  <v-expansion-panel-text>
-                    <v-text-field label="Prefixo" variant="underlined" v-model="dados[index].prefixo" />
-                    <v-text-field label="Quantidade" variant="underlined" v-model="dados[index].quantidade" />
-                    <v-text-field label="Senha" variant="underlined" v-model="dados[index].senha" />
+                <div v-if="dados.length === 0">Sem operações cadastradas</div>
 
-                    <v-btn
-                      class="text-none text-subtitle-1"
-                      color="#5865f2"
-                      size="small"
-                      variant="flat"
-                      style="color: white"
-                      @click="criarUsuarios(index)"
-                    >
-                      Adicionar Usuários
-                    </v-btn>
-
-                    <v-row no-gutters>
-                      <v-col cols="6"
-                        ><v-checkbox label="Faz PIX" v-model="dados[index].configuracoes" value="faz_pix"></v-checkbox
-                      ></v-col>
-                      <v-col cols="6"
-                        ><v-checkbox
-                          label="Faz Dinheiro"
-                          v-model="dados[index].configuracoes"
-                          value="faz_dinheiro"
-                        ></v-checkbox
-                      ></v-col>
-                      <v-col cols="6"
-                        ><v-checkbox
-                          label="Faz Crédito"
-                          v-model="dados[index].configuracoes"
-                          value="faz_credito"
-                        ></v-checkbox
-                      ></v-col>
-                      <v-col cols="6"
-                        ><v-checkbox
-                          label="Faz Débito"
-                          v-model="dados[index].configuracoes"
-                          value="faz_debito"
-                        ></v-checkbox
-                      ></v-col>
-                      <v-col cols="6"
-                        ><v-checkbox
-                          label="Faz Consumo"
-                          v-model="dados[index].configuracoes"
-                          value="faz_consumo"
-                        ></v-checkbox
-                      ></v-col>
-                      <v-col cols="6"
-                        ><v-checkbox
-                          label="Faz Recarga"
-                          v-model="dados[index].configuracoes"
-                          value="faz_recarga"
-                        ></v-checkbox
-                      ></v-col>
-                    </v-row>
-
-                    <v-expansion-panels>
-                      <v-expansion-panel
-                        v-for="(usuario, id_u) in dados[index].usuarios"
-                        :key="usuario.id_u"
-                        :title="usuario.label"
-                      >
+                <template v-else>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-expansion-panel title="Adicionar usuários em massa">
                         <v-expansion-panel-text>
                           <v-row no-gutters>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz PIX"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_pix"
-                              ></v-checkbox
-                            ></v-col>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz Dinheiro"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_dinheiro"
-                              ></v-checkbox
-                            ></v-col>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz Crédito"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_credito"
-                              ></v-checkbox
-                            ></v-col>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz Débito"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_debito"
-                              ></v-checkbox
-                            ></v-col>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz Consumo"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_consumo"
-                              ></v-checkbox
-                            ></v-col>
-                            <v-col cols="6"
-                              ><v-checkbox
-                                label="Faz Recarga"
-                                v-model="dados[index].usuarios[id_u].configuracoes"
-                                value="faz_recarga"
-                              ></v-checkbox
-                            ></v-col>
+                            <v-col cols="12">
+                              <v-text-field
+                                label="Prefixo"
+                                variant="underlined"
+                                class="ma-2"
+                                v-model="prefixo_usuario"
+                              />
+                              <v-text-field label="Quantidade" variant="underlined" class="ma-2" v-model="quantidade" />
+                              <v-text-field label="Senha" variant="underlined" class="ma-2" v-model="senha" />
+                            </v-col>
+                            <v-btn
+                              class="text-none text-subtitle-1"
+                              color="#5865f2"
+                              size="small"
+                              variant="flat"
+                              style="color: white"
+                              @click="criarUsuariosEmMassa()"
+                            >
+                              Adicionar Usuários em Massa
+                            </v-btn>
                           </v-row>
                         </v-expansion-panel-text>
                       </v-expansion-panel>
-                    </v-expansion-panels>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
+                      <v-expansion-panel v-for="(operacao, index) in dados" :key="operacao.name" :title="operacao.name">
+                        <v-expansion-panel-text>
+                          <v-expansion-panels>
+                            <v-expansion-panel title="Adicionar usuários">
+                              <v-expansion-panel-text>
+                                <v-text-field label="Prefixo" variant="underlined" v-model="dados[index].prefixo" />
+                                <v-text-field
+                                  label="Quantidade"
+                                  variant="underlined"
+                                  v-model="dados[index].quantidade"
+                                />
+                                <v-text-field label="Senha" variant="underlined" v-model="dados[index].senha" />
+
+                                <v-btn
+                                  class="text-none text-subtitle-1"
+                                  color="#5865f2"
+                                  size="small"
+                                  variant="flat"
+                                  style="color: white"
+                                  @click="criarUsuarios(index)"
+                                >
+                                  Adicionar Usuários
+                                </v-btn>
+
+                                <v-row no-gutters>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz PIX"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_pix"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Dinheiro"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_dinheiro"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Crédito"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_credito"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Débito"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_debito"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Consumo"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_consumo"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Recarga"
+                                      v-model="dados[index].configuracoes"
+                                      value="faz_recarga"
+                                    ></v-checkbox
+                                  ></v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                            <v-expansion-panel
+                              v-for="(usuario, id_u) in dados[index].usuarios"
+                              :key="usuario.id_u"
+                              :title="usuario.label"
+                            >
+                              <v-expansion-panel-text>
+                                <v-row no-gutters>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz PIX"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_pix"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Dinheiro"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_dinheiro"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Crédito"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_credito"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Débito"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_debito"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Consumo"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_consumo"
+                                    ></v-checkbox
+                                  ></v-col>
+                                  <v-col cols="6"
+                                    ><v-checkbox
+                                      label="Faz Recarga"
+                                      v-model="dados[index].usuarios[id_u].configuracoes"
+                                      value="faz_recarga"
+                                    ></v-checkbox
+                                  ></v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                          </v-expansion-panels>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-col>
+                  </v-row>
+                </template>
               </v-expansion-panels>
             </v-window-item>
           </v-window>
@@ -207,6 +254,9 @@ const qtd = ref(1);
 const ultimoIndex = ref(0);
 const tab = ref(0);
 const configuracoes = ref([]);
+const prefixo_usuario = ref('Caixa');
+const quantidade = ref(1);
+const senha = ref('imply1111');
 
 function criarOperacoes(qtd, prefixo) {
   for (let index = 0; index < qtd; index++) {
@@ -230,14 +280,35 @@ function removerOperacao(index) {
 
 function criarUsuarios(index) {
   const { prefixo, senha, quantidade, configuracoes } = dados.value[index];
+  const ja_presentes = dados.value[index].usuarios.length;
 
-  for (let id_u = 0; id_u < quantidade; id_u++) {
+  for (let id_u = 1; id_u <= quantidade; id_u++) {
     dados.value[index].usuarios.push({
-      usuario: `${prefixo.toLowerCase()}_${index}_${id_u}`,
-      label: `${prefixo} ${id_u + 1}`,
+      usuario: `${prefixo_usuario.value.toLowerCase()}_${index}_${index + ja_presentes + id_u }`,
+      label: `${prefixo_usuario.value} ${index + ja_presentes + id_u}`,
       senha,
       configuracoes,
     });
   }
+}
+
+function criarUsuariosEmMassa() {
+  const operacoesAtualizadas = dados.value.map((operacao, index) => {
+    const usuarios = [];
+    for (let id_u = 1; id_u <= quantidade.value; id_u++) {
+      usuarios.push({
+        usuario: `${prefixo_usuario.value.toLowerCase()}_${index}_${index + id_u}`,
+        senha: senha.value,
+        label: `${prefixo_usuario.value} ${index + id_u}`,
+        configuracoes: operacao.configuracoes,
+      });
+    }
+
+    console.log(usuarios);
+
+    return { ...operacao, usuarios };
+  });
+
+  dados.value = operacoesAtualizadas;
 }
 </script>
